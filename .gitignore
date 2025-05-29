@@ -1,3 +1,6 @@
-/build
+/*build
 /.vs
 /.vscode
+/vcpkg_installed
+/out
+/CMakePresets.json

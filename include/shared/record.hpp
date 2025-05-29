@@ -1,27 +1,30 @@
 #ifndef RECORD_HPP
 #define RECORD_HPP
 
+#include "record_type.hpp"
 #include <string>
 #include <ctime>
+#include <cstdlib>
 
 class Record
 {
 private:
     int id;
+    RecordType type;
     std::string name;
     std::string category;
     int amount;
     time_t date;
     
 public:
-    Record(std::string name, int amount);
+    Record(std::string name, RecordType type, std::string category, int amount, time_t date);
 
     // getter
-    void getId();
-    void getName();
-    void getCategory();
-    void getAmount();
-    void getDate();
+    int getId() const;
+    std::string getName() const;
+    std::string getCategory() const;
+    int getAmount() const;
+    time_t getDate() const;
 
     // setter
     void setName(std::string name);
@@ -29,7 +32,7 @@ public:
     void setAmount(int amount);
     void setDate(time_t date);    
 
-    ~Record();
+    virtual ~Record();
 };
 
 #endif

@@ -1,7 +1,8 @@
-#include <iostream>
-#include <record.hpp>
+#include "client.hpp"
 
 int main(){
-    std::cout << "hello" << std::endl;
+    Client client;
+    client.Run();
+
     return 0;
 }
