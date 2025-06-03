@@ -1,7 +1,8 @@
 #include "ui.hpp"
 
-SideBarPanel::SideBarPanel(const std::vector<std::string>& items) : menu_items_(items) {
-    menu_component_ = Menu(&menu_items_, &selected_menu_);
+SideBarPanel::SideBarPanel(const std::vector<std::string>& items, int* currentView) : menu_items_(items) {
+    *currentView = 0;
+    menu_component_ = Menu(&menu_items_, currentView);
     // menu_component_->set_on_enter([this] {
     //     // Handle menu selection logic here
     //     // For example, you can update the content panel based on the selected item

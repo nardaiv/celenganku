@@ -1,19 +1,19 @@
 #include "expense_tracker.hpp"
 
 // constructor
-ExpenseTracker::ExpenseTracker(){
+ExpenseTracker::ExpenseTracker() : Collection(std::make_shared<std::vector<Record>>()) {
     std::cout << "ExpenseTracker initialized." << std::endl;
 }
 
 void ExpenseTracker::addRecord(Record newRecord){
-    Collection.push_back(newRecord);
+    Collection->push_back(newRecord);
     // this->save();
 }
 
 void ExpenseTracker::removeRecord(int id){
-    for (int i = 0; i < Collection.size(); i++){
-        if (Collection[i].getId() == id){
-            Collection.erase(Collection.begin() + i);
+    for (int i = 0; i < Collection->size(); i++){
+        if ((*Collection)[i].getId() == id){
+            Collection->erase(Collection->begin() + i);
             break;
         }
     }
@@ -32,3 +32,7 @@ void ExpenseTracker::removeRecord(int id){
 // }
 
 ExpenseTracker::~ExpenseTracker() = default;
+
+std::shared_ptr<std::vector<Record>> ExpenseTracker::getCollection(){
+    return Collection;
+}

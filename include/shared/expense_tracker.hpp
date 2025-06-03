@@ -3,13 +3,14 @@
 
 #include "record.hpp"
 #include <vector>
+#include <memory>
 #include <fstream>
 #include <iostream>
 
 class ExpenseTracker
 {
 private:
-    std::vector<Record> Collection; 
+    std::shared_ptr<std::vector<Record>> Collection;
     int balance;
 
 public:
@@ -20,9 +21,8 @@ public:
 
     //TODO : add search and filter methods
     
-
+    std::shared_ptr<std::vector<Record>> getCollection();
     virtual ~ExpenseTracker();
-
 };
 
 #endif

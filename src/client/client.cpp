@@ -2,143 +2,135 @@
 
 Client::Client() : 
     screen_(ScreenInteractive::Fullscreen()), 
-    home_(std::make_shared<Home>()) {
-    // Initialize the local collection
-    // this->localCollection = ExpenseTracker();
-
-    // auto sidebar_ = std::make_shared<SideBarPanel>(std::vector<std::string>{
-    //     "Home", "Add Expense", "View Expenses", "Settings", "Exit"
-    // });
-
-    // auto content_ = std::make_shared<ContentPanel>();
-
-    // this->main_container_ =  Container::Horizontal({
-    //         sidebar_->GetComponent(),
-    // });
-
-
-    // // Set the initial focus to the sidebar
-    // app_renderer_ = Renderer(main_container_, [this, sidebar_, content_]() {
-
-    //     int selected_item = sidebar_->getSelectedItem();
-    //     if (selected_item != -1) {
-    //         switch (selected_item) {
-    //             case 0: 
-    //                 content_->setSelectedContent(0);
-    //                 break;
-    //             case 1: 
-    //                 content_->setSelectedContent(1);
-    //                 break;
-    //             case 2: 
-    //                 content_->setSelectedContent(2);
-    //                 break;
-    //             case 3: 
-    //                 content_->setSelectedContent(3);
-    //                 break;
-    //             case 4: 
-    //                 screen_.Exit();
-                    
-    //             default:
-    //                 content_->setSelectedContent(0);
-    //         }
-    //     }
-
-    //     // Layout
-    //     return vbox({
-    //         text("Expense Tracker") | bold | center,
-    //         separator(),
-    //         hflow({
-    //             // main_container_->Render(),
-    //             sidebar_->Render(),
-    //             content_->Render()
-    //         }) | border,
-    //     });
-    // });
+    Form_(std::make_shared<Form>()), 
+    View_expenses_(std::make_shared<ViewExpenses>(localCollection.getCollection())) {
+    
+    // Initialize sidebar
+    sidebar_ = std::make_shared<SideBarPanel>(std::vector<std::string>{
+        "Home", "Add Expense", "View Expenses", "Settings", "Exit"
+    }, &this->current_view);
+    
+    // Initialize main container
+    main_container_ = Container::Vertical({
+        sidebar_->GetComponent(),
+        Form_->GetComponent()
+    });
 }
 
 Element Client::LoginView(){
-    return text("Login!") | center |flex;
-}
-
-Element Client::HomeView() {
-    // auto home = std::make_shared<Home>();
-    // main_container_ = Container::Vertical({sidebar_->GetComponent(), home->GetComponent()});
-    // return home->Render();
-
-
-    
-    // main_container_ = Container::Vertical({sidebar_->GetComponent(), home_->GetComponent()});
-
-    return home_->Render();
+    return text("Login!") | center | flex;
 }
 
 Element Client::FormView() {
-    return text("Form!") | center;
+    return Form_->Render();
+}
+
+Element Client::HomeView() {
+    return text("Home!") | center;
 }
 
 Element Client::SettingsView() {
     return text("Setting!") | center;
 }
 
-Element Client::ViewExpenses() {
-    return text("View Expenses!") | center;
+Element Client::ViewExpensesView() {
+    return View_expenses_->Render();
 }
 
-void Client::saveLocalCollection(){
 
-}
 
 void Client::Run() {
-    sidebar_ = std::make_shared<SideBarPanel>(std::vector<std::string>{
-        "Home", "Add Expense", "View Expenses", "Settings", "Exit"
-    });
-
-    home_ = std::make_shared<Home>();
-    main_container_ = Container::Vertical({sidebar_->GetComponent(), home_->GetComponent()});
-
-    // temporary
-    this->current_view = HOME;
-
     app_renderer_ = Renderer(main_container_, [this]{
         this->HandleView();
         return this->current;
-    } );
+    });
 
     screen_.Loop(app_renderer_);
 }
 
 void Client::HandleView(){
-    if(current_view != LOGIN)
-        this->current_view = sidebar_.get()->getSelectedItem();
+    if (Form_->checkIsClicked()){
+        try {
+            std::string name = Form_->getName();
+            RecordType type = RecordType(Form_->getType());
+            std::string category = Form_->getCategory();
+            std::string amount = Form_->getAmount();
 
+            if (!name.empty() && !category.empty() && !amount.empty()) {
+                Record newRecord(
+                    name,
+                    type,
+                    10,  // TODO: Generate proper ID
+                    category,
+                    std::stoi(amount),
+                    std::time(0)
+                );
+                
+                localCollection.addRecord(newRecord);
+                
+                // Create new form
+                Form_ = std::make_shared<Form>();
+                
+                // Update the view expenses component
+                View_expenses_ = std::make_shared<ViewExpenses>(localCollection.getCollection());
+                
+                // Switch to view expenses
+                this->current_view = VIEW_EXPENSES;
+                this->saveLocalCollection();
+            }
+        } catch (const std::exception& e) {
+            // Handle any errors silently and keep the form open
+            this->current_view = FORM;
+        }
+    }
+
+    // Update the current view
     switch(this->current_view) {
         case HOME:
-            // current = hbox(this->sidebar_->Render(), this->HomeView());
             current = hbox({
-                this->sidebar_->Render(), 
-                this->HomeView() | flex
+                sidebar_->Render() | size(WIDTH, EQUAL, 20),
+                HomeView() | flex
             });
-            // main_container_ = Container::Vertical({sidebar_->GetComponent(), });
             break;
         case FORM:
-            current =hbox(this->sidebar_->Render(), this->FormView());
+            current = hbox({
+                sidebar_->Render() | size(WIDTH, EQUAL, 20),
+                FormView() | flex
+            });
             break;
         case VIEW_EXPENSES:
-            current = hbox(this->sidebar_->Render(),this->ViewExpenses());
+            current = hbox({
+                sidebar_->Render() | size(WIDTH, EQUAL, 20),
+                ViewExpensesView() | flex
+            });
             break;
         case SETTINGS:
-            current = hbox(this->sidebar_->Render(), this->SettingsView());
+            current = hbox({
+                sidebar_->Render() | size(WIDTH, EQUAL, 20),
+                SettingsView() | flex
+            });
             break;
         case LOGIN:
-            current = this->LoginView();
+            current = LoginView();
             break;
         case EXIT:
-            this->screen_.Exit();
+            screen_.Exit();
             break;
     }
 }
 
+void Client::saveLocalCollection(){
+    std::ofstream outfile("data.bin", std::ios::binary);
+        
+    size_t size = this->localCollection.getCollection()->size();
+    outfile.write(reinterpret_cast<const char*>(&size), sizeof(size_t));
+    
+    // Write the vector data
+    outfile.write(reinterpret_cast<const char*>(this->localCollection.getCollection()->data()), size * sizeof(Record));
+    outfile.close();
+}
+
 Client::~Client() {
-    this->saveLocalCollection();
-    this->screen_.Exit();
-};
+    saveLocalCollection();
+    screen_.Exit();
+}

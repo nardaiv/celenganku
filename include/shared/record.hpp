@@ -17,7 +17,7 @@ private:
     time_t date;
     
 public:
-    Record(std::string name, RecordType type, std::string category, int amount, time_t date);
+    Record(std::string name, RecordType type, int id, std::string category, int amount, time_t date);
 
     // getter
     int getId() const;
@@ -25,6 +25,7 @@ public:
     std::string getCategory() const;
     int getAmount() const;
     time_t getDate() const;
+    RecordType getType() const;
 
     // setter
     void setName(std::string name);
