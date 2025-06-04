@@ -7,13 +7,23 @@ ViewExpenses::ViewExpenses(std::shared_ptr<std::vector<Record>> collection) :
     collection(collection),
     total_income(0),
     total_expenses(0),
-    balance(0) {
+    balance(0),
+    sort_by_date(true),
+    sort_button_clicked(false) {
     
-    // Sort records by date (newest first)
-    std::sort(collection->begin(), collection->end(), 
-        [](const Record& a, const Record& b) {
-            return a.getDate() > b.getDate();
-        });
+    // Initialize sort button
+    sort_button_ = Button("Sort by: Date", [this] {
+        sort_by_date = !sort_by_date;
+        sort_button_clicked = true;
+        // Recreate button with new label
+        sort_button_ = Button(
+            "Sort by: " + std::string(sort_by_date ? "Date" : "Name"),
+            [this] {
+                sort_by_date = !sort_by_date;
+                sort_button_clicked = true;
+            }
+        );
+    });
 
     // Initialize cached elements
     updateHeaders();
@@ -23,7 +33,9 @@ ViewExpenses::ViewExpenses(std::shared_ptr<std::vector<Record>> collection) :
 }
 
 Component ViewExpenses::GetComponent() {
-    return Container::Vertical({});
+    return Container::Vertical({
+        sort_button_
+    });
 }
 
 void ViewExpenses::calculateTotals() {
@@ -60,15 +72,15 @@ void ViewExpenses::updateSummary() {
         vbox({
             text("Summary") | bold | center,
             hbox({
-                text("Total Income   : ") | bold,
+                text("Total Income: ") | bold,
                 text(std::to_string(total_income)) | color(Color::Green)
             }),
             hbox({
-                text("Total Expenses : ") | bold,
+                text("Total Expenses: ") | bold,
                 text(std::to_string(total_expenses)) | color(Color::Red)
             }),
             hbox({
-                text("Balance         : ") | bold,
+                text("Balance: ") | bold,
                 text(std::to_string(balance)) | 
                     color(balance >= 0 ? Color::Green : Color::Red)
             })
@@ -76,10 +88,51 @@ void ViewExpenses::updateSummary() {
     );
 }
 
+void ViewExpenses::sortRecords(std::vector<Record>& records) {
+    if (sort_by_date) {
+        // Sort by date (newest first)
+        std::sort(records.begin(), records.end(), 
+            [](const Record& a, const Record& b) {
+                return a.getDate() > b.getDate();
+            });
+    } else {
+        // Sort alphabetically by name
+        std::sort(records.begin(), records.end(), 
+            [](const Record& a, const Record& b) {
+                return a.getName() < b.getName();
+            });
+    }
+}
+
 void ViewExpenses::updateRecordRows() {
     record_rows = Elements();
     
-    for(const auto& record : *collection) {
+    // Create a copy of records for sorting
+    std::vector<Record> sorted_records = *collection;
+    
+    // Sort records based on current sort mode
+    sortRecords(sorted_records);
+    
+    // Recreate button with updated label
+    sort_button_ = Button(
+        "Sort by: " + std::string(sort_by_date ? "Date" : "Name"),
+        [this] {
+            sort_by_date = !sort_by_date;
+            sort_button_clicked = true;
+        }
+    );
+    
+    if (sorted_records.empty()) {
+        record_rows.push_back(
+            vbox({
+                text("No records found.") | dim | center,
+                text("Add your first transaction using the 'Add Expense' menu.") | dim | center
+            })
+        );
+        return;
+    }
+
+    for(const auto& record : sorted_records) {
         // Format amount
         std::stringstream ss;
         ss << std::fixed << std::setprecision(0) << record.getAmount();
@@ -106,43 +159,42 @@ void ViewExpenses::updateRecordRows() {
                 text(record.getType() == EARNING ? "Income" : "Expense") | 
                     size(WIDTH, EQUAL, 10) |
                     color(record.getType() == EARNING ? Color::Green : Color::Red)
-            })
+            }) | flex
         );
     }
+}
+
+Element ViewExpenses::Render() {
+    // Check if sort button was clicked
+    if (sort_button_clicked) {
+        updateRecordRows();
+        sort_button_clicked = false;
+    }
+
+    return vbox({
+        // Sort button at the top
+        hbox({
+            text("") | flex,
+            sort_button_->Render(),
+            text("") | flex
+        }),
+        separator(),
+        
+        // Summary section
+        vbox(summary_section),
+        separator(),
+        
+        // Table headers
+        vbox(table_headers),
+        separator(),
+        
+        // Record rows in a scrollable container
+        vbox(record_rows) | yframe | flex
+    }) | flex | border;
 }
 
 void ViewExpenses::Update() {
     calculateTotals();
     updateSummary();
     updateRecordRows();
-}
-
-Element ViewExpenses::Render() {
-    Elements children;
-    
-    // Add summary section
-    children.insert(children.end(), summary_section.begin(), summary_section.end());
-    children.push_back(separator());
-    
-    // Add headers
-    children.insert(children.end(), table_headers.begin(), table_headers.end());
-    children.push_back(separator());
-
-    // Add record rows
-    if (!record_rows.empty()) {
-        children.insert(children.end(), record_rows.begin(), record_rows.end());
-    } else {
-        children.push_back(
-            vbox({
-                text("No records found.") | dim | center,
-                text("Add your first transaction using the 'Add Expense' menu.") | dim | center
-            })
-        );
-    }
-
-    return vbox({
-        text("Transaction History") | bold | center,
-        separator(),
-        vbox(std::move(children)) | yframe | flex
-    }) | flex | border;
 }

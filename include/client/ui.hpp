@@ -127,12 +127,17 @@ public:
 class ViewExpenses : public UIBase {
 private:
     Component content_component_;
+    Component sort_button_;
     std::shared_ptr<std::vector<Record>> collection;
     
     // Member variables for calculations
     int total_income;
     int total_expenses;
     int balance;
+
+    // Sort state
+    bool sort_by_date;  // true = date, false = alphabetical
+    bool sort_button_clicked;
 
     // Cached elements
     Elements table_headers;
@@ -144,6 +149,7 @@ private:
     void updateHeaders();
     void updateSummary();
     void updateRecordRows();
+    void sortRecords(std::vector<Record>& records);
 
 public:
     ViewExpenses(std::shared_ptr<std::vector<Record>> collection);

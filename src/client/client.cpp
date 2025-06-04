@@ -30,6 +30,7 @@ Client::Client() :
         Form_->GetComponent(),
         Login_->GetComponent(),
         Settings_->GetComponent(),
+        View_expenses_->GetComponent(),
         Home_->GetComponent()
     });
 
