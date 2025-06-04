@@ -63,12 +63,11 @@ private:
     std::shared_ptr<SideBarPanel> sidebar_;
     void HandleView();
 
-    // std::shared_ptr<Home> Home_;
     std::shared_ptr<Form> Form_;
     std::shared_ptr<ViewExpenses> View_expenses_;
     std::shared_ptr<Login> Login_;
     std::shared_ptr<Settings> Settings_;
-    // std::shared_ptr<Login> Login_;
+    std::shared_ptr<Home> Home_;
 
     // Views
     Element LoginView();

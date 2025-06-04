@@ -8,6 +8,13 @@ ExpenseTracker::ExpenseTracker() : Collection(std::make_shared<std::vector<Recor
 void ExpenseTracker::addRecord(Record newRecord){
     Collection->push_back(newRecord);
     // this->save();
+    if (newRecord.getType() == EARNING){
+        total_income += newRecord.getAmount();
+        balance += newRecord.getAmount();
+    } else {
+        total_expenses += newRecord.getAmount();
+        balance -= newRecord.getAmount();
+    }
 }
 
 void ExpenseTracker::removeRecord(int id){
@@ -39,4 +46,16 @@ std::shared_ptr<std::vector<Record>> ExpenseTracker::getCollection(){
 
 void ExpenseTracker::setCollection(std::shared_ptr<std::vector<Record>> collection){
     this->Collection = collection;
+}
+
+int ExpenseTracker::getBalance(){
+    return balance;
+}
+
+int ExpenseTracker::getTotalIncome(){
+    return total_income;
+}
+
+int ExpenseTracker::getTotalExpenses(){
+    return total_expenses;
 }

@@ -6,9 +6,9 @@ Form::Form():
     category(""), 
     amount(""), 
     type(0),
-    name_status("❌"),
-    category_status("❌"),
-    amount_status("❌") {
+    name_status("x"),
+    category_status("x"),
+    amount_status("x") {
     
     input_name_ = Input(&name, "insert transaction name");
     
@@ -90,7 +90,7 @@ Element Form::Render() {
         hbox(
             text("Transaction   : "), 
             input_name_->Render() | flex,
-            text(name_status)
+            text(name != "" ? "✓" : "x")
         ),
         hbox(
             text("Type          : "), 
@@ -99,12 +99,12 @@ Element Form::Render() {
         hbox(
             text("Amount        : "), 
             input_amount_->Render() | flex,
-            text(amount_status)
+            text(amount  != "" ? "✓" : "x")
         ),
         hbox(
             text("Category      : "), 
             input_category_->Render() | flex,
-            text(category_status)
+            text(category != "" ? "✓" : "x")
         ),
         separator(),
         button_submit_->Render() | center

@@ -60,15 +60,15 @@ void ViewExpenses::updateSummary() {
         vbox({
             text("Summary") | bold | center,
             hbox({
-                text("Total Income: ") | bold,
+                text("Total Income   : ") | bold,
                 text(std::to_string(total_income)) | color(Color::Green)
             }),
             hbox({
-                text("Total Expenses: ") | bold,
+                text("Total Expenses : ") | bold,
                 text(std::to_string(total_expenses)) | color(Color::Red)
             }),
             hbox({
-                text("Balance: ") | bold,
+                text("Balance         : ") | bold,
                 text(std::to_string(balance)) | 
                     color(balance >= 0 ? Color::Green : Color::Red)
             })

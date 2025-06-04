@@ -3,6 +3,7 @@
 
 #include "views.hpp"
 #include "record.hpp"
+#include "expense_tracker.hpp"
 
 #include <ftxui/component/component.hpp>
 #include <ftxui/screen/screen.hpp>
@@ -163,6 +164,27 @@ public:
     Element Render() override;
     bool checkExportClicked();
     void resetExportClicked();
+};
+
+class Home : public UIBase {
+private:
+    Elements summary_section;
+    Elements record_rows;
+    int total_income;
+    int total_expenses;
+    int balance;
+
+    ExpenseTracker& collection;
+
+    void calculateTotals();
+    void updateSummary();
+    void updateRecordRows();    
+    void updateRecentTransactions();
+
+public:
+    Home(ExpenseTracker& collection);
+    Component GetComponent() override;
+    Element Render() override;
 };
 
 #endif 

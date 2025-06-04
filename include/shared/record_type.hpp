@@ -2,8 +2,8 @@
 #define RECORD_TYPE_HPP
 
 enum RecordType {
-    EARNING,
-    SPENDING
+    SPENDING,
+    EARNING
 };
 
 #endif

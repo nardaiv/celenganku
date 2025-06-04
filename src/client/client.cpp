@@ -3,18 +3,21 @@
 #include <iostream>
 #include <cstring>
 
+
 Client::Client() : 
     screen_(ScreenInteractive::Fullscreen()), 
     Form_(std::make_shared<Form>()), 
-    View_expenses_(std::make_shared<ViewExpenses>(localCollection.getCollection())),
+    // View_expenses_(std::make_shared<ViewExpenses>(localCollection.getCollection())),
     Login_(std::make_shared<Login>()),
     Settings_(std::make_shared<Settings>()),
+    Home_(std::make_shared<Home>(localCollection)),
     current_view(LOGIN),
     socket(std::make_unique<ClientSocket>()),
     connected(false) {
     
     // Load saved data
     loadLocalCollection();
+    View_expenses_ = std::make_shared<ViewExpenses>(localCollection.getCollection());
     
     // Initialize sidebar
     sidebar_ = std::make_shared<SideBarPanel>(std::vector<std::string>{
@@ -26,7 +29,8 @@ Client::Client() :
         sidebar_->GetComponent(),
         Form_->GetComponent(),
         Login_->GetComponent(),
-        Settings_->GetComponent()
+        Settings_->GetComponent(),
+        Home_->GetComponent()
     });
 
     // Try to connect to server
@@ -106,7 +110,7 @@ Element Client::FormView() {
 }
 
 Element Client::HomeView() {
-    return text("Home!") | center;
+    return Home_->Render();
 }
 
 Element Client::SettingsView() {
