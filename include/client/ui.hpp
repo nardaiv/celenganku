@@ -20,14 +20,9 @@
 #include <string>
 #include <functional>
 
-
-
 using namespace ftxui;
 
 class UIBase {
-private:
-
-
 public:
     virtual ~UIBase() = default;
     virtual Component GetComponent() = 0;
@@ -35,6 +30,38 @@ public:
     virtual void Update() {};
 };
 
+class Login : public UIBase {
+private:
+    Component content_component_;
+    Component input_username_;
+    Component input_password_;
+    Component button_login_;
+    Component button_register_;
+
+    std::string username;
+    std::string password;
+    bool isLoginClicked;
+    bool isRegisterClicked;
+    bool isError;
+    std::string error_message;
+
+public:
+    Login();
+    Component GetComponent() override;
+    Element Render() override;
+    void Update() override;
+    void Reset();
+
+    // Getters
+    std::string getUsername() const;
+    std::string getPassword() const;
+    bool checkLoginClicked();
+    bool checkRegisterClicked();
+    
+    // Setters
+    void setError(const std::string& message);
+    void clearError();
+};
 
 class SideBarPanel : public UIBase {
 private:
@@ -48,7 +75,6 @@ public:
     Element Render() override;
     int getSelectedItem() const;
 };
-
 
 class ContentPanel : public UIBase {
 private:
@@ -80,35 +106,49 @@ private:
     std::string amount;
     bool isClicked;
 
+    std::string name_status;
+    std::string category_status;
+    std::string amount_status;
+
 public:
     Form();
     Component GetComponent() override;
     Element Render() override;
-    // Setters and Getters
-    void setSelectedContent(int index);
-    int getSelectedContent() const;
+    // void Update() override;
 
     std::string getName() const;
     std::string getCategory() const;
     int getType() const;
     std::string getAmount() const;
     bool checkIsClicked();
-
 };
 
 class ViewExpenses : public UIBase {
 private:
     Component content_component_;
-    std::vector<std::string> toggle_entries;
     std::shared_ptr<std::vector<Record>> collection;
+    
+    // Member variables for calculations
+    int total_income;
+    int total_expenses;
+    int balance;
+
+    // Cached elements
+    Elements table_headers;
+    Elements summary_section;
+    Elements record_rows;
+
+    // Private helper methods
+    void calculateTotals();
+    void updateHeaders();
+    void updateSummary();
+    void updateRecordRows();
 
 public:
     ViewExpenses(std::shared_ptr<std::vector<Record>> collection);
     Component GetComponent() override;
     Element Render() override;
-
-
+    void Update() override;
 };
-
 
 #endif 

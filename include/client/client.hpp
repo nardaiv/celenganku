@@ -27,7 +27,6 @@ private:
     Component main_container_;
     ScreenInteractive screen_;
     int current_view = 0;
-    // int current_view2 = 0;
     Element current;
     std::shared_ptr<SideBarPanel> sidebar_;
     void HandleView();
@@ -35,6 +34,7 @@ private:
     // std::shared_ptr<Home> Home_;
     std::shared_ptr<Form> Form_;
     std::shared_ptr<ViewExpenses> View_expenses_;
+    std::shared_ptr<Login> Login_;
     // std::shared_ptr<Settings> Settings_;
     // std::shared_ptr<Login> Login_;
 
@@ -44,6 +44,14 @@ private:
     Element FormView();
     Element SettingsView();
     Element ViewExpensesView();
+    
+    void ReinitializeContainer();
+
+    // Input
+    // std::string name;
+    // RecordType type;
+    // std::string category;
+    // std::string amount;
     
 
 public:
