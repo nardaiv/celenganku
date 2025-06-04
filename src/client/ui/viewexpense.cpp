@@ -106,7 +106,7 @@ void ViewExpenses::updateRecordRows() {
                 text(record.getType() == EARNING ? "Income" : "Expense") | 
                     size(WIDTH, EQUAL, 10) |
                     color(record.getType() == EARNING ? Color::Green : Color::Red)
-            }) | flex
+            })
         );
     }
 }

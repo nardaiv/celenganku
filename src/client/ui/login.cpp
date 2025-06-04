@@ -62,21 +62,21 @@ Element Login::Render() {
             button_login_->Render(),
             text(" "),  // spacer
             button_register_->Render()
-        }) | center
+        }) | center | flex
     });
 
     Elements elements;
     elements.push_back(title);
     elements.push_back(subtitle);
     elements.push_back(separator());
-    elements.push_back(form);
+    elements.push_back(form | size(WIDTH, EQUAL, 100) | center);
 
     if (isError) {
         elements.push_back(separator());
         elements.push_back(text(error_message) | color(Color::Red) | center);
     }
 
-    return vbox(std::move(elements)) | border | size(WIDTH, LESS_THAN, 50);
+    return vbox(std::move(elements)) | border | flex;
 }
 
 void Login::Update() {

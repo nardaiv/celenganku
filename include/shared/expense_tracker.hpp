@@ -20,6 +20,7 @@ public:
     void removeRecord(int id);
 
     //TODO : add search and filter methods
+    void setCollection(std::shared_ptr<std::vector<Record>> collection);
     
     std::shared_ptr<std::vector<Record>> getCollection();
     virtual ~ExpenseTracker();

@@ -36,3 +36,7 @@ ExpenseTracker::~ExpenseTracker() = default;
 std::shared_ptr<std::vector<Record>> ExpenseTracker::getCollection(){
     return Collection;
 }
+
+void ExpenseTracker::setCollection(std::shared_ptr<std::vector<Record>> collection){
+    this->Collection = collection;
+}

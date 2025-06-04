@@ -24,7 +24,7 @@ using namespace ftxui;
 
 class UIBase {
 public:
-    virtual ~UIBase() = default;
+    // virtual ~UIBase() = default;
     virtual Component GetComponent() = 0;
     virtual Element Render() = 0;
     virtual void Update() {};
@@ -149,6 +149,20 @@ public:
     Component GetComponent() override;
     Element Render() override;
     void Update() override;
+};
+
+class Settings : public UIBase {
+private:
+    Component content_component_;
+    Component export_button_;
+    bool export_clicked_;
+
+public:
+    Settings();
+    Component GetComponent() override;
+    Element Render() override;
+    bool checkExportClicked();
+    void resetExportClicked();
 };
 
 #endif 
